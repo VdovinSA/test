@@ -1,0 +1,4 @@
+.current-tbl td, .current-tbl th
+{
+border: 1px solid black;
+}
