@@ -6,7 +6,11 @@ Bitrix\Main\Loader::registerAutoLoadClasses(null, [
 const MY_DELIVERY=3;
 const MY_POINT_ADDRESS='Орел, Кромское шоссе, 4';
 
-AddEventHandler("sale", "OnOrderNewSendEmail", "OrderNewSendEmailMyHandler");
+\Bitrix\Main\EventManager::getInstance()->addEventHandler(
+    'sale',
+    'OnOrderNewSendEmail',
+    'OrderNewSendEmailMyHandler'
+);
 function OrderNewSendEmailMyHandler($orderID, &$eventName, &$arFields){
     \Bitrix\Main\Loader::IncludeModule('sale');
     $order = \Bitrix\Sale\Order::load($orderID);
@@ -24,8 +28,6 @@ function OrderNewSendEmailMyHandler($orderID, &$eventName, &$arFields){
     'OnSaleStatusOrderChange',
     'OnSaleStatusOrderChangeMyHandler'
 );
-
-//AddEventHandler( "sale" , "OnSaleStatusOrderChange" , "OnSaleStatusOrderChangeMyHandler" );
 function OnSaleStatusOrderChangeMyHandler ( \Bitrix\Main\Event $event )
 {
     $status = $event->getParameter("VALUE");
@@ -34,20 +36,21 @@ function OnSaleStatusOrderChangeMyHandler ( \Bitrix\Main\Event $event )
      */
     $order = $event->getParameter("ENTITY");
     $userID = $order->getUserId();
-    if($status=='F'){
+    $arPersonalFields = array(
+        'PERSONAL_COUNTRY' => 0,
+        'PERSONAL_CITY' => '',
+        'PERSONAL_STREET' => '',
+        'PERSONAL_STATE' => '',
+        'PERSONAL_ZIP' => '',
+        'PERSONAL_NOTES' => '',
+        'PERSONAL_MAILBOX' => '',
+    );
 
+    if($status=='F'){
+        $user = new CUser;
+        $user->Update($userID,$arPersonalFields);
+        lib\MyHelper::showArguments($user->LAST_ERROR);
     }
-    lib\MyHelper::showArguments($event->getParameters());
-    die('121342');
-    if (! $order ->isPaid() or $order ->isPaid()== false ) return ; // Обрабатываем только оплаченные заказы
-    //Тут происходит какая то логика для оплаченного заказа
-    //ID заказа: $order->getId()
-    //ID пользователя: $order->getUserId()
-    //Сумма заказа: $order->getPrice()
-    //Размер скидки: $order->getDiscountPrice()
-    //Стоимость доставки: $order->getDeliveryPrice()
-    //Оплаченная сумма: $order->getSumPaid()
-    //Сумма заказа: $order->getPrice()
 }
 
 ?>

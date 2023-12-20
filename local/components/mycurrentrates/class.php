@@ -28,7 +28,7 @@ class CMyCurrentRates extends CBitrixComponent
     {
         try
         {
-            if($this->startResultCache())
+            if($this->startResultCache(additionalCacheID:date('d.m.y')))
             {
                 $this->arResult['CURRENT_RATES']=$this->MyCurrentRate();
                 $this->includeComponentTemplate();
